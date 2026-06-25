@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hindlux - Premium Sanitary Solutions</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="loader-container">
+            <div class="loader-logo">hindlux</div>
+            <div class="loader-bar"><div class="loader-fill"></div></div>
+            <p class="loader-text">Premium Sanitary Solutions</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app" class="hidden">
+        <!-- NAVIGATION -->
+        <nav id="navbar">
+            <div class="nav-container">
+                <div class="nav-brand" onclick="showSection('landing')">
+                    <img id="nav-logo" src="logo.jpeg" alt="Hindlux Logo" class="nav-logo">
+                    <span id="nav-company-name" class="nav-company-name">hindlux</span>
+                </div>
+                <div class="nav-links" id="nav-links">
+                    <a onclick="showSection('landing')" class="nav-link active" data-section="landing">Home</a>
+                    <a onclick="showSection('categories')" class="nav-link" data-section="categories">Categories</a>
+                    <a onclick="showSection('about')" class="nav-link" data-section="about">About</a>
+                    <a onclick="showSection('cart')" class="nav-link cart-link" data-section="cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>My Cart</span>
+                        <span id="cart-count" class="cart-badge hidden">0</span>
+                    </a>
+                </div>
+                <div class="nav-actions">
+                    <button id="admin-logout-btn" class="btn btn-outline btn-sm hidden" onclick="adminLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- MOBILE MENU -->
+        <div id="mobile-menu" class="mobile-menu">
+            <a onclick="showSection('landing'); toggleMobileMenu();">Home</a>
+            <a onclick="showSection('categories'); toggleMobileMenu();">Categories</a>
+            <a onclick="showSection('about'); toggleMobileMenu();">About</a>
+            <a onclick="showSection('cart'); toggleMobileMenu();">My Cart</a>
+        </div>
+
+        <!-- LANDING PAGE -->
+        <section id="landing" class="section active">
+            <div class="hero">
+                <div class="hero-particles" id="hero-particles"></div>
+                <div class="hero-content animate-in">
+                    <h1 class="hero-title">Premium <span class="text-gradient">Sanitary</span> Solutions</h1>
+                    <p class="hero-subtitle" id="hero-about-text">Discover the finest range of sanitary products for your dream home. Quality, elegance, and durability - all in one place.</p>
+                    <button class="btn btn-primary btn-lg" onclick="showSection('categories')">
+                        Explore Products <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-circle"></div>
+                    <div class="hero-shape shape-1"></div>
+                    <div class="hero-shape shape-2"></div>
+                    <div class="hero-shape shape-3"></div>
+                </div>
+            </div>
+            <div class="features-section">
+                <div class="feature-card animate-in">
+                    <div class="feature-icon"><i class="fas fa-gem"></i></div>
+                    <h3>Premium Quality</h3>
+                    <p>Finest materials and craftsmanship</p>
+                </div>
+                <div class="feature-card animate-in">
+                    <div class="feature-icon"><i class="fas fa-truck"></i></div>
+                    <h3>Fast Delivery</h3>
+                    <p>Quick and reliable shipping</p>
+                </div>
+                <div class="feature-card animate-in">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Warranty</h3>
+                    <p>Extended warranty on all products</p>
+                </div>
+                <div class="feature-card animate-in">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <h3>24/7 Support</h3>
+                    <p>Round the clock customer support</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORIES PAGE -->
+        <section id="categories" class="section">
+            <div class="section-container">
+                <h2 class="section-title animate-in">Our Categories</h2>
+                <p class="section-subtitle animate-in">Choose a category to explore our products</p>
+                <div id="categories-grid" class="categories-grid"></div>
+            </div>
+        </section>
+
+        <!-- PRODUCTS PAGE -->
+        <section id="products" class="section">
+            <div class="section-container">
+                <div class="breadcrumb">
+                    <a onclick="showSection('categories')"><i class="fas fa-arrow-left"></i> Back to Categories</a>
+                    <span id="current-category-name"></span>
+                </div>
+                <h2 class="section-title animate-in" id="products-title">Products</h2>
+                <div id="products-grid" class="products-grid"></div>
+            </div>
+        </section>
+
+        <!-- CART PAGE -->
+        <section id="cart" class="section">
+            <div class="section-container">
+                <h2 class="section-title animate-in">My Cart</h2>
+                <div id="cart-empty" class="cart-empty">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Add some products to get started!</p>
+                    <button class="btn btn-primary" onclick="showSection('categories')">Browse Products</button>
+                </div>
+                <div id="cart-content" class="hidden">
+                    <div id="cart-items" class="cart-items"></div>
+                    <div class="cart-summary">
+                        <div class="cart-total">
+                            <span>Total:</span>
+                            <span id="cart-total-price">₹0</span>
+                        </div>
+                        <button class="btn btn-primary btn-lg full-width" onclick="checkoutWhatsApp()">
+                            <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT PAGE -->
+        <section id="about" class="section">
+            <div class="section-container">
+                <h2 class="section-title animate-in">About Us</h2>
+                <div class="about-content animate-in">
+                    <div class="about-text">
+                        <div id="about-text-content">
+                            <p>Welcome to <strong>Hindlux</strong>, your trusted partner in premium sanitary solutions. We offer a curated selection of high-quality sanitaryware, faucets, and accessories to transform your bathroom into a luxurious retreat.</p>
+                            <p>With years of experience in the industry, we understand the importance of quality, design, and durability. Our products are sourced from leading manufacturers to ensure you receive nothing but the best.</p>
+                            <p>Whether you're building a new home or renovating your bathroom, our expert team is here to help you find the perfect products that match your style and budget.</p>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img id="about-page-image" src="logo.jpeg" alt="Hindlux" class="about-logo-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer id="site-footer" class="site-footer">
+            <div class="footer-container">
+                <div id="footer-content" class="footer-content">
+                    <div class="footer-col">
+                        <h3 id="footer-company-name">hindlux</h3>
+                        <p id="footer-desc">Your trusted partner for premium sanitary solutions.</p>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Quick Links</h4>
+                        <a onclick="showSection('landing')">Home</a>
+                        <a onclick="showSection('categories')">Categories</a>
+                        <a onclick="showSection('about')">About</a>
+                        <a onclick="showSection('cart')">My Cart</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Contact</h4>
+                        <p id="footer-phone"><i class="fas fa-phone"></i> +91 8086438990</p>
+                        <p id="footer-email"><i class="fas fa-envelope"></i> info@hindlux.com</p>
+                        <p id="footer-address"><i class="fas fa-map-marker-alt"></i> Kerala, India</p>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Follow Us</h4>
+                        <div class="footer-social">
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p id="footer-copyright">&copy; 2026 Hindlux. All rights reserved.</p>
+                    <a id="footer-admin-link" class="footer-admin-link">Admin</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ADMIN AUTH MODAL -->
+    <div id="admin-auth-modal" class="modal">
+        <div class="modal-overlay" onclick="closeModal('admin-auth-modal')"></div>
+        <div class="modal-content animate-in">
+            <button class="modal-close" onclick="closeModal('admin-auth-modal')">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-lock"></i> Admin Authorization</h2>
+            <p class="modal-desc">Click the button below to receive an OTP at the registered email.</p>
+            <div id="otp-step-1">
+                <button class="btn btn-primary full-width" onclick="sendOTP()" id="send-otp-btn">
+                    <i class="fas fa-paper-plane"></i> Send Authorization OTP
+                </button>
+            </div>
+            <div id="otp-step-2" class="hidden">
+                <div class="form-group">
+                    <label>Enter OTP</label>
+                    <input type="text" id="otp-input" maxlength="6" placeholder="Enter 6-digit OTP" class="otp-input">
+                </div>
+                <button class="btn btn-primary full-width" onclick="verifyOTP()">
+                    <i class="fas fa-check-circle"></i> Verify & Authorize
+                </button>
+                <button class="btn btn-outline full-width" onclick="sendOTP()" style="margin-top: 10px;">Resend OTP</button>
+            </div>
+            <div id="otp-message" class="otp-message hidden"></div>
+        </div>
+    </div>
+
+    <!-- ADMIN PAGE -->
+    <section id="admin-section" class="section hidden">
+        <div class="section-container">
+            <h2 class="section-title animate-in"><i class="fas fa-cog"></i> Admin Dashboard</h2>
+
+            <!-- Admin Tabs -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchAdminTab('company')">Company Details</button>
+                <button class="admin-tab" onclick="switchAdminTab('categories-admin')">Categories</button>
+                <button class="admin-tab" onclick="switchAdminTab('products-admin')">Products</button>
+                <button class="admin-tab" onclick="switchAdminTab('about-admin')">About Content</button>
+            </div>
+
+            <!-- Company Details Tab -->
+            <div id="tab-company" class="admin-tab-content active">
+                <div class="admin-card">
+                    <h3>Company Details</h3>
+                    <form onsubmit="saveCompanyDetails(event)">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" id="admin-company-name" placeholder="Company name">
+                        </div>
+                        <div class="form-group">
+                            <label>Logo Image</label>
+                            <div class="file-upload">
+                                <input type="file" id="admin-logo-file" accept="image/*" onchange="previewLogo(event)">
+                                <div class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose logo image</span>
+                                </div>
+                            </div>
+                            <img id="admin-logo-preview" class="admin-preview-img hidden" alt="Logo Preview">
+                            <small>Leave empty to keep current logo</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Company Details</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Categories Admin Tab -->
+            <div id="tab-categories-admin" class="admin-tab-content">
+                <div class="admin-card">
+                    <h3>Add New Category</h3>
+                    <form onsubmit="addCategory(event)">
+                        <div class="form-group">
+                            <label>Category Name</label>
+                            <input type="text" id="admin-category-name" required placeholder="e.g. Wash Basins">
+                        </div>
+                        <div class="form-group">
+                            <label>Category Image</label>
+                            <div class="file-upload">
+                                <input type="file" id="admin-category-image" accept="image/*" required>
+                                <div class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose category image</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Category</button>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h3>Existing Categories</h3>
+                    <div id="admin-categories-list" class="admin-list"></div>
+                </div>
+            </div>
+
+            <!-- Products Admin Tab -->
+            <div id="tab-products-admin" class="admin-tab-content">
+                <div class="admin-card">
+                    <h3>Add New Product</h3>
+                    <form onsubmit="addProduct(event)">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="admin-product-category" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="admin-product-name" required placeholder="Product name">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="admin-product-desc" required placeholder="Product description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Price (₹)</label>
+                            <input type="number" id="admin-product-price" required placeholder="Price" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Product Image</label>
+                            <div class="file-upload">
+                                <input type="file" id="admin-product-image" accept="image/*" required>
+                                <div class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose product image</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h3>Existing Products</h3>
+                    <div id="admin-products-list" class="admin-list"></div>
+                </div>
+            </div>
+
+            <!-- About Content Tab -->
+            <div id="tab-about-admin" class="admin-tab-content">
+                <div class="admin-card">
+                    <h3>About Page Content</h3>
+                    <form onsubmit="saveAboutContent(event)">
+                        <div class="form-group">
+                            <label>About Content</label>
+                            <textarea id="admin-about-content" rows="6" placeholder="About page content..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>About Image</label>
+                            <div class="file-upload">
+                                <input type="file" id="admin-about-image" accept="image/*">
+                                <div class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose about image</span>
+                                </div>
+                            </div>
+                            <img id="admin-about-preview" class="admin-preview-img hidden" alt="About Preview">
+                            <small>Leave empty to keep current image</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save About Content</button>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h3>Footer Content</h3>
+                    <form onsubmit="saveFooterContent(event)">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" id="admin-footer-name" placeholder="Company name">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" id="admin-footer-desc" placeholder="Footer description">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" id="admin-footer-phone" placeholder="Phone number">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="text" id="admin-footer-email" placeholder="Email address">
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" id="admin-footer-address" placeholder="Address">
+                        </div>
+                        <div class="form-group">
+                            <label>Copyright Text</label>
+                            <input type="text" id="admin-footer-copyright" placeholder="© 2026 Hindlux. All rights reserved.">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Footer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EDIT CATEGORY MODAL -->
+    <div id="edit-category-modal" class="modal">
+        <div class="modal-overlay" onclick="closeModal('edit-category-modal')"></div>
+        <div class="modal-content animate-in">
+            <button class="modal-close" onclick="closeModal('edit-category-modal')">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-edit"></i> Edit Category</h2>
+            <form onsubmit="saveEditCategory(event)">
+                <input type="hidden" id="edit-category-key">
+                <div class="form-group">
+                    <label>Category Name</label>
+                    <input type="text" id="edit-category-name" required placeholder="Category name">
+                </div>
+                <div class="form-group">
+                    <label>Category Image</label>
+                    <div class="file-upload">
+                        <input type="file" id="edit-category-image" accept="image/*">
+                        <div class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Choose new image (optional)</span>
+                        </div>
+                    </div>
+                    <img id="edit-category-preview" class="admin-preview-img hidden" alt="Preview">
+                    <small>Leave empty to keep current image</small>
+                </div>
+                <button type="submit" class="btn btn-primary full-width">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT PRODUCT MODAL -->
+    <div id="edit-product-modal" class="modal">
+        <div class="modal-overlay" onclick="closeModal('edit-product-modal')"></div>
+        <div class="modal-content modal-lg animate-in">
+            <button class="modal-close" onclick="closeModal('edit-product-modal')">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-edit"></i> Edit Product</h2>
+            <form onsubmit="saveEditProduct(event)">
+                <input type="hidden" id="edit-product-key">
+                <div class="modal-form-grid">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="edit-product-name" required placeholder="Product name">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="edit-product-price" required placeholder="Price" min="0">
+                    </div>
+                    <div class="form-group full-span">
+                        <label>Description</label>
+                        <textarea id="edit-product-desc" required placeholder="Product description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group full-span">
+                        <label>Product Image</label>
+                        <div class="file-upload">
+                            <input type="file" id="edit-product-image" accept="image/*">
+                            <div class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose new image (optional)</span>
+                            </div>
+                        </div>
+                        <img id="edit-product-preview" class="admin-preview-img hidden" alt="Preview">
+                        <small>Leave empty to keep current image</small>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary full-width">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT ABOUT MODAL -->
+    <div id="edit-about-modal" class="modal">
+        <div class="modal-overlay" onclick="closeModal('edit-about-modal')"></div>
+        <div class="modal-content animate-in">
+            <button class="modal-close" onclick="closeModal('edit-about-modal')">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-edit"></i> Edit About Content</h2>
+            <form onsubmit="saveEditAbout(event)">
+                <div class="form-group">
+                    <label>About Content</label>
+                    <textarea id="edit-about-content" rows="6" placeholder="About page content..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>About Image</label>
+                    <div class="file-upload">
+                        <input type="file" id="edit-about-image" accept="image/*">
+                        <div class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Choose image (optional)</span>
+                        </div>
+                    </div>
+                    <img id="edit-about-preview" class="admin-preview-img hidden" alt="Preview">
+                    <small>Leave empty to keep current image</small>
+                </div>
+                <button type="submit" class="btn btn-primary full-width">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast hidden">
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- FIREBASE SDK -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
