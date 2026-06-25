@@ -8,7 +8,16 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+
+app.use(express.static(path.join(__dirname), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
 
 let currentOTP = null;
 let otpExpiry = null;
