@@ -281,11 +281,18 @@ function reobserveAnimations() {
 }
 
 // ==================== NAVIGATION ====================
+function closeMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    if (menu) {
+        menu.classList.remove('show');
+    }
+}
+
 function showNormalNav() {
     document.getElementById('nav-links').classList.remove('hidden');
     document.getElementById('nav-links').style.display = '';
     document.getElementById('admin-logout-btn').classList.add('hidden');
-    document.getElementById('mobile-menu').classList.remove('show');
+    closeMobileMenu();
     document.getElementById('site-footer').classList.remove('hidden');
 }
 
@@ -293,7 +300,7 @@ function showAdminNav() {
     document.getElementById('nav-links').classList.add('hidden');
     document.getElementById('nav-links').style.display = 'none';
     document.getElementById('admin-logout-btn').classList.remove('hidden');
-    document.getElementById('mobile-menu').classList.remove('show');
+    closeMobileMenu();
     document.getElementById('mobile-menu').classList.add('hidden');
 }
 
@@ -325,6 +332,16 @@ window.toggleMobileMenu = function() {
     menu.classList.remove('hidden');
     menu.classList.toggle('show');
 };
+
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('mobile-menu');
+    const hamburger = document.getElementById('hamburger');
+    if (menu && menu.classList.contains('show')) {
+        if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+            closeMobileMenu();
+        }
+    }
+});
 
 // ==================== MODALS ====================
 window.openModal = function(id) {
@@ -523,7 +540,12 @@ window.sendOTP = async function() {
         if (data.success) {
             document.getElementById('otp-step-1').classList.add('hidden');
             document.getElementById('otp-step-2').classList.remove('hidden');
-            showOTPMessage('OTP sent to registered email', 'success');
+
+            if (data.otp) {
+                showOTPMessage('Email failed! Your OTP is: ' + data.otp, 'error');
+            } else {
+                showOTPMessage('OTP sent to registered email', 'success');
+            }
         } else {
             showOTPMessage(data.message || 'Failed to send OTP. Try again.', 'error');
         }
@@ -568,8 +590,13 @@ window.verifyOTP = async function() {
 
 function showOTPMessage(msg, type) {
     const el = document.getElementById('otp-message');
-    el.textContent = msg;
-    el.className = `otp-message ${type}`;
+    if (msg.includes('Your OTP is:')) {
+        const otp = msg.split('Your OTP is: ')[1];
+        el.innerHTML = 'Email sending failed. Use this OTP:<br><strong>' + otp + '</strong>';
+    } else {
+        el.textContent = msg;
+    }
+    el.className = 'otp-message ' + type;
     el.classList.remove('hidden');
 }
 
