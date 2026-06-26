@@ -1,6 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, set, get, push, remove, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBG9bjkl2SMP5sxU6b_7168AkbyinRwVFg",
@@ -15,7 +14,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const auth = getAuth(app);
 
 let cart = [];
 let currentCategory = null;
@@ -479,10 +477,9 @@ window.checkoutWhatsApp = async function() {
     showToast('Order placed successfully!');
 };
 
-// ==================== ADMIN PHONE AUTH ====================
-const ADMIN_PHONE = '+918086438990';
-let confirmationResult = null;
-let recaptchaVerifier = null;
+// ==================== ADMIN AUTH ====================
+const DEFAULT_PASSWORD = 'password';
+let adminPassword = localStorage.getItem('hindlux_admin_pass') || DEFAULT_PASSWORD;
 
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.shiftKey && e.code === 'KeyA') {
@@ -538,86 +535,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-window.sendOTP = async function() {
-    const btn = document.getElementById('send-otp-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-    showOTPMessage('Sending OTP to your phone...', 'success');
+window.verifyPassword = function() {
+    const input = document.getElementById('admin-password-input').value;
+    const msgEl = document.getElementById('otp-message');
 
-    try {
-        if (!recaptchaVerifier) {
-            recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                size: 'invisible',
-                callback: function() {}
-            });
-        }
-
-        confirmationResult = await signInWithPhoneNumber(auth, ADMIN_PHONE, recaptchaVerifier);
-
-        document.getElementById('otp-step-1').classList.add('hidden');
-        document.getElementById('otp-step-2').classList.remove('hidden');
-        showOTPMessage('OTP sent to ' + ADMIN_PHONE, 'success');
-    } catch (error) {
-        console.error('Phone auth error:', error);
-
-        if (error.code === 'auth/too-many-requests') {
-            showOTPMessage('Too many attempts. Wait a few minutes and try again.', 'error');
-        } else if (error.code === 'auth/invalid-app-credential') {
-            showOTPMessage('Firebase config error. Check Firebase Console settings.', 'error');
-        } else {
-            showOTPMessage('Failed to send OTP: ' + error.message, 'error');
-        }
-
-        if (recaptchaVerifier) {
-            try { recaptchaVerifier.render(); } catch(e) {}
-        }
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP to Phone';
-};
-
-window.verifyOTP = async function() {
-    const otp = document.getElementById('otp-input').value.trim();
-
-    if (otp.length !== 6) {
-        showOTPMessage('Please enter a valid 6-digit OTP', 'error');
-        return;
-    }
-
-    if (!confirmationResult) {
-        showOTPMessage('No OTP sent. Click Send OTP first.', 'error');
-        return;
-    }
-
-    try {
-        await confirmationResult.confirm(otp);
-
+    if (input === adminPassword) {
         isAdminAuthorized = true;
         closeModal('admin-auth-modal');
         showAdminSection();
         showToast('Admin authorized successfully!');
-    } catch (error) {
-        console.error('Verify error:', error);
-        if (error.code === 'auth/invalid-verification-code') {
-            showOTPMessage('Invalid OTP. Check and try again.', 'error');
-        } else {
-            showOTPMessage('Verification failed: ' + error.message, 'error');
-        }
+    } else {
+        msgEl.textContent = 'Incorrect password. Try again.';
+        msgEl.className = 'otp-message error';
+        msgEl.classList.remove('hidden');
     }
 };
 
-function showOTPMessage(msg, type) {
-    const el = document.getElementById('otp-message');
-    if (msg.includes('Your OTP is:')) {
-        const otp = msg.split('Your OTP is: ')[1];
-        el.innerHTML = 'Email sending failed. Use this OTP:<br><strong>' + otp + '</strong>';
-    } else {
-        el.textContent = msg;
+window.resetAdminPassword = function() {
+    const current = document.getElementById('reset-current-pass').value;
+    const newPass = document.getElementById('reset-new-pass').value;
+    const msgEl = document.getElementById('reset-pass-msg');
+
+    if (current !== adminPassword) {
+        msgEl.textContent = 'Current password is incorrect.';
+        msgEl.className = 'otp-message error';
+        msgEl.classList.remove('hidden');
+        return;
     }
-    el.className = 'otp-message ' + type;
-    el.classList.remove('hidden');
-}
+
+    if (newPass.length < 4) {
+        msgEl.textContent = 'New password must be at least 4 characters.';
+        msgEl.className = 'otp-message error';
+        msgEl.classList.remove('hidden');
+        return;
+    }
+
+    adminPassword = newPass;
+    localStorage.setItem('hindlux_admin_pass', newPass);
+    document.getElementById('reset-current-pass').value = '';
+    document.getElementById('reset-new-pass').value = '';
+    msgEl.textContent = 'Password changed successfully!';
+    msgEl.className = 'otp-message success';
+    msgEl.classList.remove('hidden');
+    showToast('Admin password updated');
+};
 
 function showAdminSection() {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hindlux - Premium Sanitary Solutions</title>
-    <link rel="stylesheet" href="style.css?v=3.0">
+    <link rel="stylesheet" href="style.css?v=4.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -207,23 +207,14 @@
         <div class="modal-content animate-in">
             <button class="modal-close" onclick="closeModal('admin-auth-modal')">&times;</button>
             <h2 class="modal-title"><i class="fas fa-lock"></i> Admin Authorization</h2>
-            <p class="modal-desc">An OTP will be sent to the registered phone number via SMS.</p>
-            <div id="otp-step-1">
-                <div id="recaptcha-container"></div>
-                <button class="btn btn-primary full-width" onclick="sendOTP()" id="send-otp-btn">
-                    <i class="fas fa-sms"></i> Send OTP to Phone
-                </button>
+            <p class="modal-desc">Enter admin password to continue.</p>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="admin-password-input" placeholder="Enter password" class="otp-input" onkeydown="if(event.key==='Enter')verifyPassword()">
             </div>
-            <div id="otp-step-2" class="hidden">
-                <div class="form-group">
-                    <label>Enter OTP</label>
-                    <input type="text" id="otp-input" maxlength="6" placeholder="Enter 6-digit OTP" class="otp-input" inputmode="numeric">
-                </div>
-                <button class="btn btn-primary full-width" onclick="verifyOTP()">
-                    <i class="fas fa-check-circle"></i> Verify & Authorize
-                </button>
-                <button class="btn btn-outline full-width" onclick="sendOTP()" style="margin-top: 10px;">Resend OTP</button>
-            </div>
+            <button class="btn btn-primary full-width" onclick="verifyPassword()">
+                <i class="fas fa-check-circle"></i> Verify & Authorize
+            </button>
             <div id="otp-message" class="otp-message hidden"></div>
         </div>
     </div>
@@ -239,6 +230,7 @@
                 <button class="admin-tab" onclick="switchAdminTab('categories-admin')">Categories</button>
                 <button class="admin-tab" onclick="switchAdminTab('products-admin')">Products</button>
                 <button class="admin-tab" onclick="switchAdminTab('about-admin')">About Content</button>
+                <button class="admin-tab" onclick="switchAdminTab('password-admin')">Reset Password</button>
             </div>
 
             <!-- Company Details Tab -->
@@ -392,6 +384,23 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Reset Password Tab -->
+            <div id="tab-password-admin" class="admin-tab-content">
+                <div class="admin-card">
+                    <h3>Reset Admin Password</h3>
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" id="reset-current-pass" placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="reset-new-pass" placeholder="Enter new password">
+                    </div>
+                    <button class="btn btn-primary" onclick="resetAdminPassword()">Update Password</button>
+                    <div id="reset-pass-msg" class="otp-message hidden"></div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -497,6 +506,6 @@
     </div>
 
     <!-- FIREBASE SDK -->
-    <script type="module" src="app.js?v=3.0"></script>
+    <script type="module" src="app.js?v=4.0"></script>
 </body>
 </html>
