@@ -27,7 +27,16 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: 'sanalshijilkk52@gmail.com',
     pass: 'cawn xdya kfpx vptv'
+  },
+  tls: {
+    rejectUnauthorized: false
   }
+});
+
+transporter.verify().then(() => {
+  console.log('Email transporter verified successfully');
+}).catch(err => {
+  console.error('Email transporter verification failed:', err.message);
 });
 
 function generateOTP() {
@@ -39,8 +48,10 @@ app.post('/api/send-otp', async (req, res) => {
     currentOTP = generateOTP();
     otpExpiry = Date.now() + 5 * 60 * 1000;
 
+    console.log('Generated OTP:', currentOTP, 'Expires at:', new Date(otpExpiry).toLocaleString());
+
     const mailOptions = {
-      from: 'sanalshijilkk52@gmail.com',
+      from: '"Hindlux Admin" <sanalshijilkk52@gmail.com>',
       to: 'sanalshijilkk52@gmail.com',
       subject: 'Hindlux Admin Authorization OTP',
       html: `
@@ -55,11 +66,12 @@ app.post('/api/send-otp', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.messageId);
     res.json({ success: true, message: 'OTP sent successfully' });
   } catch (error) {
-    console.error('Error sending OTP:', error);
-    res.status(500).json({ success: false, message: 'Failed to send OTP' });
+    console.error('Error sending OTP:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to send OTP: ' + error.message });
   }
 });
 

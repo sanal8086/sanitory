@@ -515,8 +515,7 @@ window.sendOTP = async function() {
     showOTPMessage('Sending OTP...', 'success');
 
     try {
-        const baseUrl = window.location.origin;
-        const response = await fetch(baseUrl + '/api/send-otp', {
+        const response = await fetch('/api/send-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -531,7 +530,7 @@ window.sendOTP = async function() {
         }
     } catch (error) {
         console.error('OTP send error:', error);
-        showOTPMessage('Server error. Make sure server is running.', 'error');
+        showOTPMessage('Cannot connect to server. Make sure the server is running.', 'error');
     }
 
     btn.disabled = false;
@@ -547,8 +546,7 @@ window.verifyOTP = async function() {
     }
 
     try {
-        const baseUrl = window.location.origin;
-        const response = await fetch(baseUrl + '/api/verify-otp', {
+        const response = await fetch('/api/verify-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ otp })
@@ -565,7 +563,7 @@ window.verifyOTP = async function() {
         }
     } catch (error) {
         console.error('OTP verify error:', error);
-        showOTPMessage('Verification failed. Try again.', 'error');
+        showOTPMessage('Cannot connect to server. Make sure the server is running.', 'error');
     }
 };
 

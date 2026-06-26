@@ -147,6 +147,12 @@ body {
     gap: 8px;
 }
 
+@media (max-width: 768px) {
+    .nav-links {
+        display: none !important;
+    }
+}
+
 .nav-link {
     padding: 8px 16px;
     border-radius: 8px;
@@ -1168,8 +1174,8 @@ body {
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    .nav-links { display: none; }
-    .hamburger { display: flex; }
+    .nav-links { display: none !important; }
+    .hamburger { display: flex !important; }
 
     .hero-title { font-size: 36px; }
     .hero-visual { display: none; }
