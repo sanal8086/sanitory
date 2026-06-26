@@ -478,6 +478,7 @@ window.checkoutWhatsApp = async function() {
 };
 
 // ==================== ADMIN OTP ====================
+// Desktop: Ctrl+Shift+A to open admin
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.shiftKey && e.code === 'KeyA') {
         e.preventDefault();
@@ -489,29 +490,40 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Mobile: Long press on logo (3 seconds) to open admin
-let logoPressTimer = null;
-const navLogo = document.getElementById('nav-logo');
-if (navLogo) {
-    navLogo.addEventListener('touchstart', function(e) {
-        logoPressTimer = setTimeout(() => {
+// Click on logo to open admin auth
+document.addEventListener('DOMContentLoaded', function() {
+    const navLogo = document.getElementById('nav-logo');
+    if (navLogo) {
+        navLogo.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             if (isAdminAuthorized) {
                 showAdminSection();
             } else {
                 openModal('admin-auth-modal');
             }
-        }, 3000);
-    });
-    navLogo.addEventListener('touchend', function() {
-        clearTimeout(logoPressTimer);
-    });
-    navLogo.addEventListener('touchmove', function() {
-        clearTimeout(logoPressTimer);
-    });
-}
+        });
 
-// Also allow long press on footer admin link
-document.addEventListener('DOMContentLoaded', function() {
+        // Mobile: long press also works
+        let logoPressTimer = null;
+        navLogo.addEventListener('touchstart', function(e) {
+            logoPressTimer = setTimeout(function() {
+                if (isAdminAuthorized) {
+                    showAdminSection();
+                } else {
+                    openModal('admin-auth-modal');
+                }
+            }, 3000);
+        });
+        navLogo.addEventListener('touchend', function() {
+            clearTimeout(logoPressTimer);
+        });
+        navLogo.addEventListener('touchmove', function() {
+            clearTimeout(logoPressTimer);
+        });
+    }
+
+    // Footer admin link
     const footerAdmin = document.getElementById('footer-admin-link');
     if (footerAdmin) {
         footerAdmin.addEventListener('click', function() {
