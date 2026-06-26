@@ -27,24 +27,39 @@ const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_PASS = process.env.GMAIL_PASS;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || GMAIL_USER;
 
+if (!GMAIL_USER || !GMAIL_PASS) {
+  console.error('');
+  console.error('[CRITICAL] GMAIL_USER and GMAIL_PASS env vars are not set!');
+  console.error('');
+  console.error('For Render: Go to Dashboard > Environment > Add:');
+  console.error('  GMAIL_USER = sanalshijilkk52@gmail.com');
+  console.error('  GMAIL_PASS = tina buna cglf dtsm');
+  console.error('');
+}
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_PASS
   },
   tls: { rejectUnauthorized: false },
-  connectionTimeout: 15000,
-  socketTimeout: 15000
+  connectionTimeout: 30000,
+  socketTimeout: 30000,
+  pool: true,
+  maxConnections: 1
 });
 
 transporter.verify().then(() => {
   console.log('[OK] Email connected');
 }).catch(err => {
   console.error('[FAIL] Email error:', err.message);
-  console.error('Check your .env file — GMAIL_USER and GMAIL_PASS must be set');
+  console.error('');
+  console.error('Fix: Set GMAIL_USER and GMAIL_PASS in Render Environment Variables');
+  console.error('Dashboard > Environment > Add Key/Value pairs');
+  console.error('');
 });
 
 function generateOTP() {
@@ -53,6 +68,10 @@ function generateOTP() {
 
 app.post('/api/send-otp', async (req, res) => {
   try {
+    if (!GMAIL_USER || !GMAIL_PASS) {
+      return res.status(500).json({ success: false, message: 'Email not configured. Admin must set env variables.' });
+    }
+
     currentOTP = generateOTP();
     otpExpiry = Date.now() + 5 * 60 * 1000;
 
@@ -62,17 +81,8 @@ app.post('/api/send-otp', async (req, res) => {
       from: '"Hindlux Security" <' + GMAIL_USER + '>',
       to: ADMIN_EMAIL,
       subject: 'Hindlux Admin Authorization OTP',
-      text: 'Your OTP is: ' + currentOTP + '\nThis OTP expires in 5 minutes.',
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:400px;margin:0 auto;padding:20px">
-          <h2 style="color:#0d0d0d;text-align:center">Hindlux Admin OTP</h2>
-          <div style="background:#f8f9fa;border-radius:10px;padding:20px;text-align:center">
-            <p style="margin:0 0 10px;color:#666">Your authorization OTP is:</p>
-            <h1 style="font-size:36px;background:linear-gradient(135deg,#0d0d0d,#1e88e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:8px;margin:10px 0">${currentOTP}</h1>
-            <p style="margin:10px 0 0;color:#999;font-size:12px">This OTP expires in 5 minutes</p>
-          </div>
-        </div>
-      `
+      text: 'Your OTP is: ' + currentOTP + '. This OTP expires in 5 minutes.',
+      html: '<div style="font-family:Arial,sans-serif;max-width:400px;margin:0 auto;padding:20px"><h2 style="color:#0d0d0d;text-align:center">Hindlux Admin OTP</h2><div style="background:#f8f9fa;border-radius:10px;padding:20px;text-align:center"><p style="margin:0 0 10px;color:#666">Your authorization OTP is:</p><h1 style="font-size:36px;background:linear-gradient(135deg,#0d0d0d,#1e88e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:8px;margin:10px 0">' + currentOTP + '</h1><p style="margin:10px 0 0;color:#999;font-size:12px">This OTP expires in 5 minutes</p></div></div>'
     });
 
     console.log('[OK] OTP email sent');
@@ -81,7 +91,7 @@ app.post('/api/send-otp', async (req, res) => {
     console.error('[FAIL] Email error:', error.message);
     currentOTP = null;
     otpExpiry = null;
-    res.status(500).json({ success: false, message: 'Failed to send email. Check server logs.' });
+    res.status(500).json({ success: false, message: 'Failed to send email. Please try again.' });
   }
 });
 
@@ -115,7 +125,6 @@ const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
   console.log('========================================');
   console.log('  Hindlux Server Running');
-  console.log('  Local:   http://localhost:' + PORT);
-  console.log('  Network: http://<your-ip>:' + PORT);
+  console.log('  Port: ' + PORT);
   console.log('========================================');
 });
