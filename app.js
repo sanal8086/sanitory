@@ -283,18 +283,17 @@ function reobserveAnimations() {
 // ==================== NAVIGATION ====================
 function showNormalNav() {
     document.getElementById('nav-links').classList.remove('hidden');
+    document.getElementById('nav-links').style.display = '';
     document.getElementById('admin-logout-btn').classList.add('hidden');
-    const mobileMenu = document.getElementById('mobile-menu');
-    if (mobileMenu) {
-        mobileMenu.classList.remove('hidden');
-        mobileMenu.classList.remove('show');
-    }
+    document.getElementById('mobile-menu').classList.remove('show');
     document.getElementById('site-footer').classList.remove('hidden');
 }
 
 function showAdminNav() {
     document.getElementById('nav-links').classList.add('hidden');
+    document.getElementById('nav-links').style.display = 'none';
     document.getElementById('admin-logout-btn').classList.remove('hidden');
+    document.getElementById('mobile-menu').classList.remove('show');
     document.getElementById('mobile-menu').classList.add('hidden');
 }
 

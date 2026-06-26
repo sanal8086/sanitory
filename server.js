@@ -101,6 +101,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Hindlux server running at http://localhost:${PORT}`);
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`Hindlux server running at http://${HOST}:${PORT}`);
+  console.log(`Access from mobile: http://<your-ip-address>:${PORT}`);
 });
