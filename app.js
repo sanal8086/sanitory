@@ -1,5 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-import { getDatabase, ref, set, get, push, remove, update } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, set, get, push, remove, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBG9bjkl2SMP5sxU6b_7168AkbyinRwVFg",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 let cart = [];
 let currentCategory = null;
@@ -477,8 +479,11 @@ window.checkoutWhatsApp = async function() {
     showToast('Order placed successfully!');
 };
 
-// ==================== ADMIN OTP ====================
-// Desktop: Ctrl+Shift+A to open admin
+// ==================== ADMIN PHONE AUTH ====================
+const ADMIN_PHONE = '+918086438990';
+let confirmationResult = null;
+let recaptchaVerifier = null;
+
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.shiftKey && e.code === 'KeyA') {
         e.preventDefault();
@@ -490,7 +495,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Click on logo to open admin auth
 document.addEventListener('DOMContentLoaded', function() {
     const navLogo = document.getElementById('nav-logo');
     if (navLogo) {
@@ -504,7 +508,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Mobile: long press also works
         let logoPressTimer = null;
         navLogo.addEventListener('touchstart', function(e) {
             logoPressTimer = setTimeout(function() {
@@ -523,7 +526,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Footer admin link
     const footerAdmin = document.getElementById('footer-admin-link');
     if (footerAdmin) {
         footerAdmin.addEventListener('click', function() {
@@ -540,29 +542,39 @@ window.sendOTP = async function() {
     const btn = document.getElementById('send-otp-btn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-    showOTPMessage('Sending OTP to your email...', 'success');
+    showOTPMessage('Sending OTP to your phone...', 'success');
 
     try {
-        const response = await fetch('/api/send-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-
-        if (data.success) {
-            document.getElementById('otp-step-1').classList.add('hidden');
-            document.getElementById('otp-step-2').classList.remove('hidden');
-            showOTPMessage('OTP sent to your registered email', 'success');
-        } else {
-            showOTPMessage(data.message || 'Failed to send OTP. Try again.', 'error');
+        if (!recaptchaVerifier) {
+            recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                size: 'invisible',
+                callback: function() {}
+            });
         }
+
+        confirmationResult = await signInWithPhoneNumber(auth, ADMIN_PHONE, recaptchaVerifier);
+
+        document.getElementById('otp-step-1').classList.add('hidden');
+        document.getElementById('otp-step-2').classList.remove('hidden');
+        showOTPMessage('OTP sent to ' + ADMIN_PHONE, 'success');
     } catch (error) {
-        console.error('OTP send error:', error);
-        showOTPMessage('Cannot connect to server. Make sure the server is running.', 'error');
+        console.error('Phone auth error:', error);
+
+        if (error.code === 'auth/too-many-requests') {
+            showOTPMessage('Too many attempts. Wait a few minutes and try again.', 'error');
+        } else if (error.code === 'auth/invalid-app-credential') {
+            showOTPMessage('Firebase config error. Check Firebase Console settings.', 'error');
+        } else {
+            showOTPMessage('Failed to send OTP: ' + error.message, 'error');
+        }
+
+        if (recaptchaVerifier) {
+            try { recaptchaVerifier.render(); } catch(e) {}
+        }
     }
 
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Authorization OTP';
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP to Phone';
 };
 
 window.verifyOTP = async function() {
@@ -573,25 +585,25 @@ window.verifyOTP = async function() {
         return;
     }
 
-    try {
-        const response = await fetch('/api/verify-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ otp })
-        });
-        const data = await response.json();
+    if (!confirmationResult) {
+        showOTPMessage('No OTP sent. Click Send OTP first.', 'error');
+        return;
+    }
 
-        if (data.success) {
-            isAdminAuthorized = true;
-            closeModal('admin-auth-modal');
-            showAdminSection();
-            showToast('Admin authorized successfully!');
-        } else {
-            showOTPMessage(data.message || 'Invalid OTP', 'error');
-        }
+    try {
+        await confirmationResult.confirm(otp);
+
+        isAdminAuthorized = true;
+        closeModal('admin-auth-modal');
+        showAdminSection();
+        showToast('Admin authorized successfully!');
     } catch (error) {
-        console.error('OTP verify error:', error);
-        showOTPMessage('Cannot connect to server. Make sure the server is running.', 'error');
+        console.error('Verify error:', error);
+        if (error.code === 'auth/invalid-verification-code') {
+            showOTPMessage('Invalid OTP. Check and try again.', 'error');
+        } else {
+            showOTPMessage('Verification failed: ' + error.message, 'error');
+        }
     }
 };
 
