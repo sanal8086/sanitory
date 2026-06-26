@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
@@ -22,13 +23,17 @@ app.use(express.static(path.join(__dirname), {
 let currentOTP = null;
 let otpExpiry = null;
 
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_PASS = process.env.GMAIL_PASS;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || GMAIL_USER;
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
   secure: true,
   auth: {
-    user: 'sanalshijilkk52@gmail.com',
-    pass: 'cawn xdya kfpx vptv'
+    user: GMAIL_USER,
+    pass: GMAIL_PASS
   },
   tls: { rejectUnauthorized: false },
   connectionTimeout: 15000,
@@ -38,15 +43,8 @@ const transporter = nodemailer.createTransport({
 transporter.verify().then(() => {
   console.log('[OK] Email connected');
 }).catch(err => {
-  console.error('[FAIL] Email not working:', err.message);
-  console.error('');
-  console.error('To fix Gmail SMTP:');
-  console.error('1. Go to https://myaccount.google.com/security');
-  console.error('2. Enable 2-Step Verification');
-  console.error('3. Go to https://myaccount.google.com/apppasswords');
-  console.error('4. Generate new App Password');
-  console.error('5. Update pass in server.js');
-  console.error('');
+  console.error('[FAIL] Email error:', err.message);
+  console.error('Check your .env file — GMAIL_USER and GMAIL_PASS must be set');
 });
 
 function generateOTP() {
@@ -58,13 +56,13 @@ app.post('/api/send-otp', async (req, res) => {
     currentOTP = generateOTP();
     otpExpiry = Date.now() + 5 * 60 * 1000;
 
-    console.log('[OTP] Sending to sanalshijilkk52@gmail.com');
+    console.log('[OTP] Sending to', ADMIN_EMAIL);
 
     await transporter.sendMail({
-      from: '"Hindlux Security" <sanalshijilkk52@gmail.com>',
-      to: 'sanalshijilkk52@gmail.com',
+      from: '"Hindlux Security" <' + GMAIL_USER + '>',
+      to: ADMIN_EMAIL,
       subject: 'Hindlux Admin Authorization OTP',
-      text: `Your OTP is: ${currentOTP}\nThis OTP expires in 5 minutes.`,
+      text: 'Your OTP is: ' + currentOTP + '\nThis OTP expires in 5 minutes.',
       html: `
         <div style="font-family:Arial,sans-serif;max-width:400px;margin:0 auto;padding:20px">
           <h2 style="color:#0d0d0d;text-align:center">Hindlux Admin OTP</h2>
@@ -83,7 +81,7 @@ app.post('/api/send-otp', async (req, res) => {
     console.error('[FAIL] Email error:', error.message);
     currentOTP = null;
     otpExpiry = null;
-    res.status(500).json({ success: false, message: 'Failed to send email. Please check server logs for fix instructions.' });
+    res.status(500).json({ success: false, message: 'Failed to send email. Check server logs.' });
   }
 });
 
