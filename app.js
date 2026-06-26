@@ -30,6 +30,7 @@ window.addEventListener('load', () => {
             document.getElementById('app').classList.remove('hidden');
             initAnimations();
             loadFirebaseData();
+            history.replaceState({ section: 'landing' }, '', '#landing');
         }, 800);
     }, 2200);
 });
@@ -317,7 +318,28 @@ window.showSection = function(sectionId) {
     showNormalNav();
     window.scrollTo(0, 0);
     setTimeout(reobserveAnimations, 100);
+
+    history.pushState({ section: sectionId }, '', '#' + sectionId);
 };
+
+window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.section) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('admin-section').classList.add('hidden');
+        document.getElementById('site-footer').classList.remove('hidden');
+        const section = document.getElementById(e.state.section);
+        if (section) section.classList.add('active');
+
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        const navLink = document.querySelector(`.nav-link[data-section="${e.state.section}"]`);
+        if (navLink) navLink.classList.add('active');
+
+        showNormalNav();
+        window.scrollTo(0, 0);
+    } else if (e.state && e.state.admin) {
+        showAdminSectionSilent();
+    }
+});
 
 window.showProducts = function(categoryKey, categoryName) {
     currentCategory = categoryKey;
@@ -581,6 +603,17 @@ window.resetAdminPassword = function() {
 };
 
 function showAdminSection() {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('admin-section').classList.remove('hidden');
+    document.getElementById('admin-section').classList.add('active');
+    document.getElementById('site-footer').classList.add('hidden');
+    showAdminNav();
+    window.scrollTo(0, 0);
+    loadAdminData();
+    history.pushState({ admin: true }, '', '#admin');
+}
+
+function showAdminSectionSilent() {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById('admin-section').classList.remove('hidden');
     document.getElementById('admin-section').classList.add('active');
