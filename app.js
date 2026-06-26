@@ -19,6 +19,7 @@ let cart = [];
 let currentCategory = null;
 let isAdminAuthorized = false;
 let logoDataUrl = null;
+let pricesEnabled = true;
 
 // ==================== LOADING SCREEN ====================
 window.addEventListener('load', () => {
@@ -90,6 +91,11 @@ async function loadFirebaseData() {
             if (aboutData.image) {
                 document.getElementById('about-page-image').src = aboutData.image;
             }
+        }
+
+        const priceSnap = await get(ref(db, 'settings/pricesEnabled'));
+        if (priceSnap.exists()) {
+            pricesEnabled = priceSnap.val();
         }
 
         loadCategories();
@@ -173,7 +179,7 @@ function createProductCard(key, prod) {
         <div class="product-card-info">
             <h3>${prod.name}</h3>
             <p>${prod.description}</p>
-            <div class="product-price">₹${prod.price}</div>
+            ${pricesEnabled ? `<div class="product-price">₹${prod.price}</div>` : ''}
             <button class="btn ${inCart ? 'btn-outline' : 'btn-primary'} full-width" onclick="addToCart('${key}')" ${inCart ? 'disabled' : ''}>
                 <i class="fas fa-${inCart ? 'check' : 'cart-plus'}"></i> ${inCart ? 'Added to Cart' : 'Add to Cart'}
             </button>
@@ -457,7 +463,7 @@ function updateCartUI() {
                 <h4>${item.name}</h4>
                 <p>${item.description.substring(0, 80)}...</p>
             </div>
-            <div class="cart-item-price">₹${item.price}</div>
+            ${pricesEnabled ? `<div class="cart-item-price">₹${item.price}</div>` : ''}
             <button class="cart-item-remove" onclick="removeFromCart(${index})">
                 <i class="fas fa-trash-alt"></i>
             </button>
@@ -465,7 +471,7 @@ function updateCartUI() {
         cartItems.appendChild(itemEl);
     });
 
-    cartTotal.textContent = `₹${total}`;
+    cartTotal.textContent = pricesEnabled ? `₹${total}` : '';
 }
 
 window.checkoutWhatsApp = async function() {
@@ -664,7 +670,21 @@ async function loadAdminData() {
     updateAdminCategoriesList();
     updateAdminProductsList();
     loadFooterToAdmin();
+
+    const priceSnap = await get(ref(db, 'settings/pricesEnabled'));
+    if (priceSnap.exists()) {
+        pricesEnabled = priceSnap.val();
+    }
+    document.getElementById('price-toggle').checked = pricesEnabled;
+    document.getElementById('price-toggle-label').textContent = pricesEnabled ? 'Prices are visible' : 'Prices are hidden';
 }
+
+window.togglePriceVisibility = async function(enabled) {
+    pricesEnabled = enabled;
+    document.getElementById('price-toggle-label').textContent = enabled ? 'Prices are visible' : 'Prices are hidden';
+    await set(ref(db, 'settings/pricesEnabled'), enabled);
+    loadProducts(currentCategory);
+};
 
 window.switchAdminTab = function(tabName) {
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));

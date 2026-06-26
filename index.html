@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hindlux - Premium Sanitary Solutions</title>
-    <link rel="stylesheet" href="style.css?v=6.0">
+    <link rel="stylesheet" href="style.css?v=7.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -285,6 +285,16 @@
             <!-- Products Admin Tab -->
             <div id="tab-products-admin" class="admin-tab-content">
                 <div class="admin-card">
+                    <h3>Price Visibility</h3>
+                    <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="price-toggle" onchange="togglePriceVisibility(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span id="price-toggle-label">Prices are visible</span>
+                    </div>
+                </div>
+                <div class="admin-card">
                     <h3>Add New Product</h3>
                     <form onsubmit="addProduct(event)">
                         <div class="form-group">
@@ -501,6 +511,6 @@
     </div>
 
     <!-- FIREBASE SDK -->
-    <script type="module" src="app.js?v=6.0"></script>
+    <script type="module" src="app.js?v=7.0"></script>
 </body>
 </html>
