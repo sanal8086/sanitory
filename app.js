@@ -528,7 +528,7 @@ window.sendOTP = async function() {
     const btn = document.getElementById('send-otp-btn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-    showOTPMessage('Sending OTP...', 'success');
+    showOTPMessage('Sending OTP to your email...', 'success');
 
     try {
         const response = await fetch('/api/send-otp', {
@@ -540,12 +540,7 @@ window.sendOTP = async function() {
         if (data.success) {
             document.getElementById('otp-step-1').classList.add('hidden');
             document.getElementById('otp-step-2').classList.remove('hidden');
-
-            if (data.otp) {
-                showOTPMessage('Email failed! Your OTP is: ' + data.otp, 'error');
-            } else {
-                showOTPMessage('OTP sent to registered email', 'success');
-            }
+            showOTPMessage('OTP sent to your registered email', 'success');
         } else {
             showOTPMessage(data.message || 'Failed to send OTP. Try again.', 'error');
         }
