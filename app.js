@@ -517,32 +517,38 @@ document.addEventListener('keydown', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
     const navLogo = document.getElementById('nav-logo');
     if (navLogo) {
-        navLogo.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (isAdminAuthorized) {
-                showAdminSection();
-            } else {
-                openModal('admin-auth-modal');
-            }
-        });
-
         let logoPressTimer = null;
-        navLogo.addEventListener('touchstart', function(e) {
+
+        function startLogoPress() {
             logoPressTimer = setTimeout(function() {
+                logoPressTimer = null;
                 if (isAdminAuthorized) {
                     showAdminSection();
                 } else {
                     openModal('admin-auth-modal');
                 }
-            }, 3000);
+            }, 2000);
+        }
+
+        function cancelLogoPress() {
+            if (logoPressTimer) {
+                clearTimeout(logoPressTimer);
+                logoPressTimer = null;
+            }
+        }
+
+        navLogo.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            startLogoPress();
         });
-        navLogo.addEventListener('touchend', function() {
-            clearTimeout(logoPressTimer);
+        navLogo.addEventListener('mouseup', cancelLogoPress);
+        navLogo.addEventListener('mouseleave', cancelLogoPress);
+
+        navLogo.addEventListener('touchstart', function(e) {
+            startLogoPress();
         });
-        navLogo.addEventListener('touchmove', function() {
-            clearTimeout(logoPressTimer);
-        });
+        navLogo.addEventListener('touchend', cancelLogoPress);
+        navLogo.addEventListener('touchmove', cancelLogoPress);
     }
 
     const footerAdmin = document.getElementById('footer-admin-link');
