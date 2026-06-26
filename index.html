@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hindlux - Premium Sanitary Solutions</title>
-    <link rel="stylesheet" href="style.css?v=4.0">
+    <link rel="stylesheet" href="style.css?v=6.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -25,7 +25,6 @@
             <div class="nav-container">
                 <div class="nav-brand" onclick="showSection('landing')">
                     <img id="nav-logo" src="logo.jpeg" alt="Hindlux Logo" class="nav-logo">
-                    <span id="nav-company-name" class="nav-company-name">hindlux</span>
                 </div>
                 <div class="nav-links" id="nav-links">
                     <a onclick="showSection('landing')" class="nav-link active" data-section="landing">Home</a>
@@ -238,10 +237,6 @@
                 <div class="admin-card">
                     <h3>Company Details</h3>
                     <form onsubmit="saveCompanyDetails(event)">
-                        <div class="form-group">
-                            <label>Company Name</label>
-                            <input type="text" id="admin-company-name" placeholder="Company name">
-                        </div>
                         <div class="form-group">
                             <label>Logo Image</label>
                             <div class="file-upload">

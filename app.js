@@ -76,10 +76,6 @@ async function loadFirebaseData() {
         const companySnap = await get(ref(db, 'company'));
         if (companySnap.exists()) {
             const data = companySnap.val();
-            if (data.name) {
-                document.getElementById('nav-company-name').textContent = data.name;
-                document.title = data.name + ' - Premium Sanitary Solutions';
-            }
             if (data.logo) {
                 document.getElementById('nav-logo').src = data.logo;
                 logoDataUrl = data.logo;
@@ -640,7 +636,6 @@ async function loadAdminData() {
     const companySnap = await get(ref(db, 'company'));
     if (companySnap.exists()) {
         const data = companySnap.val();
-        document.getElementById('admin-company-name').value = data.name || '';
         if (data.logo) {
             document.getElementById('admin-logo-preview').src = data.logo;
             document.getElementById('admin-logo-preview').classList.remove('hidden');
@@ -710,22 +705,13 @@ function readFileAsDataURL(file) {
 
 window.saveCompanyDetails = async function(e) {
     e.preventDefault();
-    const name = document.getElementById('admin-company-name').value.trim();
-
-    if (!name) {
-        showToast('Please enter company name');
-        return;
-    }
 
     try {
-        const data = { name };
+        const data = {};
         if (logoDataUrl) data.logo = logoDataUrl;
 
         await set(ref(db, 'company'), data);
-        document.getElementById('nav-company-name').textContent = name;
-        document.getElementById('footer-company-name').textContent = name;
         if (logoDataUrl) document.getElementById('nav-logo').src = logoDataUrl;
-        document.title = name + ' - Premium Sanitary Solutions';
         showToast('Company details saved!');
     } catch (error) {
         console.error('Error saving company:', error);

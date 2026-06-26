@@ -127,11 +127,8 @@ body {
 }
 
 .nav-logo {
-    width: 45px;
     height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #1e88e5;
+    object-fit: contain;
 }
 
 .nav-company-name {
@@ -1269,7 +1266,7 @@ body {
     .cart-item { flex-wrap: wrap; justify-content: center; }
 
     .nav-company-name { font-size: 18px; }
-    .nav-logo { width: 36px; height: 36px; }
+    .nav-logo { height: 36px; }
     .nav-container { height: 60px; }
 
     #mobile-menu { top: 60px; }
