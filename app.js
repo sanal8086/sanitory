@@ -284,7 +284,11 @@ function reobserveAnimations() {
 function showNormalNav() {
     document.getElementById('nav-links').classList.remove('hidden');
     document.getElementById('admin-logout-btn').classList.add('hidden');
-    document.getElementById('mobile-menu').classList.remove('hidden');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) {
+        mobileMenu.classList.remove('hidden');
+        mobileMenu.classList.remove('show');
+    }
     document.getElementById('site-footer').classList.remove('hidden');
 }
 
@@ -318,7 +322,9 @@ window.showProducts = function(categoryKey, categoryName) {
 };
 
 window.toggleMobileMenu = function() {
-    document.getElementById('mobile-menu').classList.toggle('show');
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.remove('hidden');
+    menu.classList.toggle('show');
 };
 
 // ==================== MODALS ====================
@@ -506,9 +512,14 @@ window.sendOTP = async function() {
     const btn = document.getElementById('send-otp-btn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    showOTPMessage('Sending OTP...', 'success');
 
     try {
-        const response = await fetch('/api/send-otp', { method: 'POST' });
+        const baseUrl = window.location.origin;
+        const response = await fetch(baseUrl + '/api/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
         const data = await response.json();
 
         if (data.success) {
@@ -516,9 +527,10 @@ window.sendOTP = async function() {
             document.getElementById('otp-step-2').classList.remove('hidden');
             showOTPMessage('OTP sent to registered email', 'success');
         } else {
-            showOTPMessage('Failed to send OTP. Try again.', 'error');
+            showOTPMessage(data.message || 'Failed to send OTP. Try again.', 'error');
         }
     } catch (error) {
+        console.error('OTP send error:', error);
         showOTPMessage('Server error. Make sure server is running.', 'error');
     }
 
@@ -535,7 +547,8 @@ window.verifyOTP = async function() {
     }
 
     try {
-        const response = await fetch('/api/verify-otp', {
+        const baseUrl = window.location.origin;
+        const response = await fetch(baseUrl + '/api/verify-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ otp })
@@ -551,6 +564,7 @@ window.verifyOTP = async function() {
             showOTPMessage(data.message || 'Invalid OTP', 'error');
         }
     } catch (error) {
+        console.error('OTP verify error:', error);
         showOTPMessage('Verification failed. Try again.', 'error');
     }
 };
